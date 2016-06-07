@@ -176,11 +176,13 @@ if (!defined('E_DEPRECATED')) define(E_DEPRECATED, 8192);
 
 // TODO review error handler
 function zpush_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
-    $bt = debug_backtrace();
-
-	if (defined('ZPUSH_LOG_ERROR_MASK')) $errno &= ZPUSH_ERROR_LOG_MASK;
+    if (defined('LOG_ERROR_MASK')) $errno &= LOG_ERROR_MASK;
 
     switch ($errno) {
+        case 0:
+            // logging disabled by LOG_ERROR_MASK
+            break;
+
         case E_DEPRECATED:
             // do not handle this message
             break;
@@ -194,6 +196,7 @@ function zpush_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
             break;
 
         default:
+            $bt = debug_backtrace();
             ZLog::Write(LOGLEVEL_ERROR, "trace error: $errfile:$errline $errstr ($errno) - backtrace: ". (count($bt)-1) . " steps");
             for($i = 1, $bt_length = count($bt); $i < $bt_length; $i++) {
                 $file = $line = "unknown";
