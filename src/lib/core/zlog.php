@@ -177,6 +177,9 @@ if (!defined('E_DEPRECATED')) define(E_DEPRECATED, 8192);
 // TODO review error handler
 function zpush_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
     $bt = debug_backtrace();
+
+	if (defined('ZPUSH_LOG_ERROR_MASK')) $errno &= ZPUSH_ERROR_LOG_MASK;
+
     switch ($errno) {
         case E_DEPRECATED:
             // do not handle this message
