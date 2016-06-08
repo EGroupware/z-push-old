@@ -76,7 +76,7 @@ class Streamer implements Serializable {
      * @param array     $mapping            internal mapping of variables
      * @access public
      */
-    function Streamer($mapping) {
+    function __construct($mapping) {
         $this->mapping = $mapping;
         $this->flags = false;
     }
@@ -413,8 +413,7 @@ class Streamer implements Serializable {
      * @return array
      */
     public function unserialize($data) {
-        $class = get_class($this);
-        $this->$class();
+        $this->__construct();
         $values = unserialize($data);
         foreach ($values as $k=>$v)
             $this->$k = unserialize($v);
