@@ -27,7 +27,7 @@ before_script:
   - rm -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
 
 script:
-  - find . -name "*.php" | xargs -n1 php -l
+  - find . -name "*.php" | grep -v src/vendor/composer/autoload_static.php | xargs -n1 php -l
 
 cache:
   directories:
