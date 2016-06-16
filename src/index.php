@@ -124,9 +124,11 @@ include_once(ZPUSH_CONFIG);
 
         // stream the data
         $len = ob_get_length();
+/*
         $data = ob_get_contents();
         ob_end_clean();
-
+error_log(__FILE__.': '.__LINE__." len=$len, strlen(\$data)=".strlen($data).', header_sent()='.array2string(headers_sent()));
+ZLog::Write(LOGLEVEL_DEBUG, __FILE__.': '.__LINE__." len=$len, strlen(\$data)=".strlen($data).', header_sent()='.array2string(headers_sent()));
         // log amount of data transferred
         // TODO check $len when streaming more data (e.g. Attachments), as the data will be send chunked
         ZPush::GetDeviceManager()->SentData($len);
@@ -142,10 +144,11 @@ include_once(ZPUSH_CONFIG);
 
         // send vnd.ms-sync.wbxml content type header if there is no content
         // otherwise text/html content type is added which might break some devices
+ */
         if (!headers_sent() && $len == 0)
             header("Content-Type: application/vnd.ms-sync.wbxml");
 
-        print $data;
+//        print $data;
 
         // destruct backend after all data is on the stream
         $backend->Logoff();
