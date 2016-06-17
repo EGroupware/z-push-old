@@ -52,8 +52,8 @@ define('ZPUSH_BASE_PATH', "../src");
  * MAIN
 */
 try {
-    if (!isset($_SERVER["TERM"]) || !isset($_SERVER["LOGNAME"]))
-        die("This script should not be called in a browser.");
+    if (php_sapi_name() != "cli")
+        die("This script can only be called from the CLI.");
 
     if (!defined('ZPUSH_BASE_PATH') || !file_exists(ZPUSH_BASE_PATH . "/config.php"))
         die("ZPUSH_BASE_PATH not set correctly or no config.php file found\n");
@@ -104,7 +104,7 @@ class StateMigrator20xto210 {
     /**
      * Constructor
      */
-    public function StateMigrator20xto210() {
+    public function __construct() {
         $this->sm = false;
     }
 
@@ -213,5 +213,3 @@ class StateMigrator20xto210 {
         return true;
     }
 }
-
-?>

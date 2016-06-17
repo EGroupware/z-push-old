@@ -56,14 +56,14 @@ class TopCollector extends InterProcessData {
      *
      * @access public
      */
-    public function TopCollector() {
+    public function __construct() {
         // initialize super parameters
         $this->allocate = 2097152; // 2 MB
         $this->type = 20;
         parent::__construct();
 
         // initialize params
-        $this->InitializeParams();
+        $this->initializeParams();
 
         $this->preserved = array();
         // static vars come from the parent class
@@ -222,8 +222,9 @@ class TopCollector extends InterProcessData {
                         }
                     }
                 }
-                foreach ($toClear as $tc)
+                foreach ($toClear as $tc) {
                     unset($topdata[$tc[0]][$tc[1]][$tc[2]]);
+                }
             }
 
             $stat = $this->setData($topdata, self::TOPDATA);
@@ -261,6 +262,20 @@ class TopCollector extends InterProcessData {
     }
 
     /**
+     * Reinitializes the IPC data.
+     *
+     * @access public
+     * @return boolean
+     */
+    public function ReInitIPC() {
+        $status = parent::ReInitIPC();
+        if (!status) {
+            $this->SetData(array(), self::TOPDATA);
+        }
+        return $status;
+    }
+
+    /**
      * Indicates if top data should be saved or not
      * Returns true for 10 seconds after the latest CollectData()
      * SHOULD only be called with locked mutex!
@@ -295,5 +310,3 @@ class TopCollector extends InterProcessData {
             $topdata[self::$devid][self::$user][self::$pid] = array();
     }
 }
-
-?>

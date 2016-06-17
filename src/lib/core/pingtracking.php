@@ -48,7 +48,7 @@ class PingTracking extends InterProcessData {
      *
      * @access public
      */
-    public function PingTracking() {
+    public function __construct() {
         // initialize super parameters
         $this->allocate = 512000; // 500 KB
         $this->type = 2;
@@ -89,7 +89,7 @@ class PingTracking extends InterProcessData {
         $stat = false;
 
         // initialize params
-        $this->InitializeParams();
+        $this->initializeParams();
 
         // exclusive block
         if ($this->blockMutex()) {
@@ -152,5 +152,3 @@ class PingTracking extends InterProcessData {
 
     }
 }
-
-?>

@@ -6,7 +6,7 @@
 *
 * Created   :   18.04.2008
 *
-* Copyright 2007 - 2013, 2015 Zarafa Deutschland GmbH
+* Copyright 2007 - 2016 Zarafa Deutschland GmbH
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License, version 3,
@@ -42,13 +42,13 @@
 ************************************************/
 
 if (!defined("ZPUSH_VERSION")) {
-	$commit = exec("type git && git log --date=short --pretty=format:'%h/%ad' -1");
-	if(preg_match("/^[\da-f]+\/\d{4}-\d{2}-\d{2}$/i", $commit)) {
-        define("ZPUSH_VERSION", "GIT " . $commit);
+    $path = escapeshellarg(dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+    $branch = trim(exec("hash git && cd $path >/dev/null 2>&1 && git branch --no-color  2>/dev/null | sed -e '/^[^*]/d' -e \"s/* \(.*\)/\\1/\""));
+    $version = exec("hash git && cd $path >/dev/null 2>&1 && git describe  --always &2>/dev/null");
+    if ($branch && $version) {
+        define("ZPUSH_VERSION", $branch .'-'. $version);
     }
     else {
         define("ZPUSH_VERSION", "GIT");
     }
 }
-
-?>

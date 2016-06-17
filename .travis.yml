@@ -1,0 +1,33 @@
+language: php
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7
+  - hhvm
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: hhvm
+
+#env:
+  #matrix:
+    #- LOWEST_DEPS=""
+    #- LOWEST_DEPS="--prefer-lowest"
+
+#services:
+#  - mysql
+#  - postgres
+
+sudo: required
+
+before_script:
+  - rm -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
+
+script:
+  - find . -name "*.php" | grep -v src/vendor/composer/autoload_static.php | xargs -n1 php -l
+
+cache:
+  directories:
+    - $HOME/.composer/cache

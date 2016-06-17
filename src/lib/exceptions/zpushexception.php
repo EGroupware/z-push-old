@@ -48,15 +48,15 @@ class ZPushException extends Exception {
     protected $httpHeaders = array();
     protected $showLegal = true;
 
-    public function ZPushException($message = "", $code = 0, $previous = NULL, $logLevel = false) {
+    public function __construct($message = "", $code = 0, $previous = NULL, $logLevel = false) {
         if (! $message)
             $message = $this->httpReturnMessage;
 
         if (!$logLevel)
             $logLevel = $this->defaultLogLevel;
 
-        ZLog::Write($logLevel, get_class($this) .': '. $message . ' - code: '.$code, false);
         parent::__construct($message, (int) $code);
+        ZLog::Write($logLevel, get_class($this) .': '. $message . ' - code: '.$code. ' - file: '. $this->getFile().':'.$this->getLine(), false);
     }
 
     public function getHTTPCodeString() {
@@ -71,4 +71,3 @@ class ZPushException extends Exception {
         return $this->showLegal;
     }
 }
-?>
