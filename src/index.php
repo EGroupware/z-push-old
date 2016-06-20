@@ -124,11 +124,9 @@ include_once(ZPUSH_CONFIG);
 
         // stream the data
         $len = ob_get_length();
-/*
         $data = ob_get_contents();
         ob_end_clean();
-error_log(__FILE__.': '.__LINE__." len=$len, strlen(\$data)=".strlen($data).', header_sent()='.array2string(headers_sent()));
-ZLog::Write(LOGLEVEL_DEBUG, __FILE__.': '.__LINE__." len=$len, strlen(\$data)=".strlen($data).', header_sent()='.array2string(headers_sent()));
+
         // log amount of data transferred
         // TODO check $len when streaming more data (e.g. Attachments), as the data will be send chunked
         ZPush::GetDeviceManager()->SentData($len);
@@ -144,11 +142,10 @@ ZLog::Write(LOGLEVEL_DEBUG, __FILE__.': '.__LINE__." len=$len, strlen(\$data)=".
 
         // send vnd.ms-sync.wbxml content type header if there is no content
         // otherwise text/html content type is added which might break some devices
- */
         if (!headers_sent() && $len == 0)
             header("Content-Type: application/vnd.ms-sync.wbxml");
 
-//        print $data;
+        print $data;
 
         // destruct backend after all data is on the stream
         $backend->Logoff();
@@ -235,7 +232,7 @@ ZLog::Write(LOGLEVEL_DEBUG, __FILE__.': '.__LINE__." len=$len, strlen(\$data)=".
     ZLog::Write(LOGLEVEL_INFO,
             sprintf("cmd='%s' memory='%s/%s' time='%ss' devType='%s' devId='%s' getUser='%s' from='%s' version='%s' method='%s' httpcode='%s'",
                     Request::GetCommand(), Utils::FormatBytes(memory_get_peak_usage(false)), Utils::FormatBytes(memory_get_peak_usage(true)),
-                    number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 2, ',', '.'),
+                    number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 2),
                     Request::GetDeviceType(), Request::GetDeviceID(), Request::GetGETUser(), Request::GetRemoteAddr(), @constant('ZPUSH_VERSION'), Request::GetMethod(), http_response_code() ));
 
     ZLog::Write(LOGLEVEL_DEBUG, "-------- End");
