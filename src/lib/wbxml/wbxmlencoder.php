@@ -63,7 +63,7 @@ class WBXMLEncoder extends WBXMLDefs {
     private $bodyparts;
 
     public function __construct($output, $multipart = false) {
-        $this->log = @constant('WBXML_DEBUG') === true;
+        $this->log = ZLog::WbxmlDebug();
 
         $this->_out = $output;
 
