@@ -64,7 +64,20 @@ class ZLog {
         if (!defined('LOGLEVEL'))
             define('LOGLEVEL', LOGLEVEL_OFF);
 
+        self::RequestHeader();
+
         return true;
+    }
+
+    /**
+     * Write request header to log
+     */
+    static protected function RequestHeader() {
+        self::Write(LOGLEVEL_DEBUG,"-------- Start");
+        self::Write(LOGLEVEL_DEBUG,
+            sprintf("cmd='%s' devType='%s' devId='%s' getUser='%s' from='%s' version='%s' method='%s'",
+                Request::GetCommand(), Request::GetDeviceType(), Request::GetDeviceID(), Request::GetGETUser(),
+                Request::GetRemoteAddr(), @constant('ZPUSH_VERSION'), Request::GetMethod()));
     }
 
 	/**
@@ -142,29 +155,31 @@ class ZLog {
 		self::getLogger()->SetSpecialLogUsers($users);
 	}
 
-	/**
-	 * Enable device specific logging for a given device to $dev_id.log
-	 *
-	 * If logger does not support setting a specific file, logging will happen
-	 * as if enabled for the user of the device.
-	 *
-	 * @param string $dev_id
-	 */
-	public function EnableDeviceLog($dev_id) {
+    /**
+     * Enable device specific logging for a given device to $dev_id.log
+     *
+     * If logger does not support setting a specific file, logging will happen
+     * as if enabled for the user of the device.
+     *
+     * @param string $dev_id
+     */
+    public function EnableDeviceLog($dev_id) {
         global $specialLogUsers; // This variable comes from the configuration file (config.php)
 
-		if ($dev_id === Request::GetDeviceID())
-		{
-			$logger = self::getLogger();
-			list($user) = Utils::SplitDomainUser(strtolower(Request::GetGETUser()));
-			if (!in_array($user, $specialLogUsers)) $specialLogUsers[] = $user;
-			$logger->SetSpecialLogUsers($specialLogUsers);
+        if ($dev_id === Request::GetDeviceID())
+        {
+            $logger = self::getLogger();
+            list($user) = Utils::SplitDomainUser(strtolower(Request::GetGETUser()));
+            if (!in_array($user, $specialLogUsers)) $specialLogUsers[] = $user;
+            $logger->SetSpecialLogUsers($specialLogUsers);
 
-			if (method_exists($logger, 'setLogToUserFile')) {
-				$logger->setLogToUserFile(preg_replace('/[^a-z0-9]/', '_', $dev_id).'.log');
-			}
-		}
-	}
+            if (method_exists($logger, 'setLogToUserFile')) {
+                $logger->setLogToUserFile(preg_replace('/[^a-z0-9]/', '_', $dev_id).'.log');
+            }
+
+            self::RequestHeader();
+        }
+    }
 
     /**
      * Returns the logger object. If no logger has been initialized, FileLog will be initialized and returned.
