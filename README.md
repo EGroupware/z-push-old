@@ -28,7 +28,7 @@ git push egroupware HEAD:master
 </pre>
 Merge to our release branch from master:
 <pre>
-cd activesync/vendor/vendor/z-push
+cd activesync/vendor/z-push/z-push
 git checkout 16.1
 git pull
 git merge 16.1 master
