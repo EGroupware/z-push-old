@@ -84,6 +84,10 @@ class SqlStateMachine implements IStateMachine {
             throw new FatalMisconfigurationException("SqlStateMachine(): missing configuration for the state sql. Check STATE_SQL_* values in the configuration.");
         }
 
+        if (!preg_match('/[0-9a-zA-Z$_]+/', STATE_SQL_DATABASE)) {
+            throw new FatalMisconfigurationException(sprintf("SqlStateMachine(): invalid database name '%s'. The name may contain ASCII 7bit letters, numbers and the '$' and '_' signs. Please change your configuration.", STATE_SQL_DATABASE));
+        }
+
         $this->options = array();
         if (trim(STATE_SQL_OPTIONS)) {
             $this->options = unserialize(STATE_SQL_OPTIONS);
@@ -492,8 +496,6 @@ class SqlStateMachine implements IStateMachine {
      * @return int
      */
     public function GetStateVersion() {
-        ZLog::Write(LOGLEVEL_DEBUG, "SqlStateMachine->GetStateVersion().");
-
         $sth = null;
         $record = null;
         $version = IStateMachine::STATEVERSION_01;
@@ -654,14 +656,14 @@ class SqlStateMachine implements IStateMachine {
      * If the parameter is null then " IS NULL" is returned, else " = $key".
      *
      * @param array& $params $params[$key] will be unset, if is_null($params[$key])
-	 * @param string $key eg. ":key"
+     * @param string $key eg. ":key"
      *
      * @access protected
      * @return string
      */
     protected function getSQLOp(&$params, $key) {
-        if (is_null($params[$key])) {
-			unset($params[$key]);
+        if (!array_key_exists($key, $params) || (array_key_exists($key, $params) && is_null($params[$key]))) {
+            unset($params[$key]);
             return " IS NULL";
         }
         return " = $key";
@@ -712,11 +714,11 @@ class SqlStateMachine implements IStateMachine {
     protected function getStateHashStatement(&$params, $key=':key') {
         if (!isset($this->stateHashStatement) || $this->stateHashStatement == null) {
             $sql = "SELECT updated_at FROM {$this->states_table} WHERE device_id = :devid AND state_type = :type AND uuid ". $this->getSQLOp($params, $key) ." AND counter = :counter";
-			$this->stateHashStatement = $this->getDbh()->prepare($sql);
+            $this->stateHashStatement = $this->getDbh()->prepare($sql);
         }
-		else {
-			$this->getSQLOp($params, $key);	// need to unset $params[':key'] for NULL
-		}
+        else {
+            $this->getSQLOp($params, $key);    // need to unset $params[':key'] for NULL
+        }
         return $this->stateHashStatement;
     }
     /**
@@ -727,7 +729,6 @@ class SqlStateMachine implements IStateMachine {
      * @throws UnavailableException
      */
     protected function checkDbAndTables() {
-        ZLog::Write(LOGLEVEL_DEBUG, "SqlStateMachine->checkDbAndTables(): Checking if database and tables are available.");
         try {
             $sqlStmt = sprintf("SHOW TABLES FROM %s", STATE_SQL_DATABASE);
             $sth = $this->getDbh(false)->prepare($sqlStmt);
@@ -768,7 +769,7 @@ class SqlStateMachine implements IStateMachine {
             $sqlStmt = sprintf("CREATE DATABASE %s", STATE_SQL_DATABASE);
             $sth = $dbh->prepare($sqlStmt);
             $sth->execute();
-            ZLog::Write(LOGLEVEL_DEBUG, "SqlStateMachine->createDB(): Database created succesfully.");
+            ZLog::Write(LOGLEVEL_DEBUG, "SqlStateMachine->createDB(): Database created successfully.");
             $this->createTables();
             $this->clearConnection($dbh);
             return true;
@@ -796,7 +797,7 @@ class SqlStateMachine implements IStateMachine {
                 ));
             $sth = $this->getDbh()->prepare($sqlStmt);
             $sth->execute();
-            ZLog::Write(LOGLEVEL_DEBUG, "SqlStateMachine->createTables(): tables created succesfully.");
+            ZLog::Write(LOGLEVEL_DEBUG, "SqlStateMachine->createTables(): tables created successfully.");
             return true;
         }
         catch (PDOException $ex) {
